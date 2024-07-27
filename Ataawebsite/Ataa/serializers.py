@@ -28,6 +28,23 @@ class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ('id', 'email', 'first_name', 'last_name', 'user_type', 'is_active', 'is_staff')
+        extra_kwargs = {
+            'password': {'write_only': True, 'required': False},
+            'email': {'required': False}
+        }
+
+        def update(self, instance, validated_data):
+            instance.email = validated_data.get('email', instance.email)
+            instance.first_name = validated_data.get('first_name', instance.first_name)
+            instance.last_name = validated_data.get('last_name', instance.last_name)
+            instance.user_type = validated_data.get('user_type', instance.user_type)
+
+            # فحص وجود كلمة السر وتحديثها إذا تم تقديمها
+            if 'password1' in validated_data:
+                instance.set_password(validated_data['password1'])
+
+            instance.save()
+            return instance
 
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
