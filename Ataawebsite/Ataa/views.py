@@ -5,8 +5,19 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import PermissionDenied
 from django.contrib.auth import logout
-from .serializers import CustomUserCreationSerializer, LoginSerializer, CustomUserSerializer
-from .models import CustomUser
+from .serializers import CustomUserCreationSerializer, LoginSerializer, CustomUserSerializer ,ItemSerializer
+from .models import CustomUser ,Item
+
+class ItemCreateView(generics.CreateAPIView):
+    queryset = Item.objects.all()
+    serializer_class = ItemSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+    def get(self, request, *args, **kwargs):
+        return render(request, 'add_item.html')
 
 class RegisterView(generics.CreateAPIView):
     serializer_class = CustomUserCreationSerializer

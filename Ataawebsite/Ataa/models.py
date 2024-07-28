@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
+from django.contrib.auth import get_user_model
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
@@ -37,3 +38,22 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.email
+
+class Category(models.Model):
+    name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name
+
+class Item(models.Model):
+    item_id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=255)
+    size = models.CharField(max_length=50)
+    availability = models.IntegerField()
+    image = models.ImageField(upload_to='images/')  # Changed to ImageField
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    amount = models.IntegerField()
+    CustomUser = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)  #
+
+    def __str__(self):
+        return self.name

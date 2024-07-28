@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate
 from .models import CustomUser
+from .models import Item
 
 class CustomUserCreationSerializer(serializers.ModelSerializer):
     class Meta:
@@ -55,3 +56,9 @@ class LoginSerializer(serializers.Serializer):
         if user is None:
             raise serializers.ValidationError('Invalid email or password')
         return {'user': user}
+
+class ItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Item
+        fields = '__all__'
+        read_only_fields = ('user',)
