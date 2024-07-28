@@ -61,4 +61,4 @@ class ItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = Item
         fields = '__all__'
-        read_only_fields = ('user',)
+        read_only_fields = ('CustomUser',)
