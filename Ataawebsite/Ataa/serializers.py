@@ -1,12 +1,11 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate
-from .models import CustomUser
-from .models import Item
+from .models import CustomUser, Item
 
 class CustomUserCreationSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ('email', 'first_name', 'last_name', 'user_type', 'password')
+        fields = ('id', 'email', 'first_name', 'last_name', 'user_type', 'password')
         extra_kwargs = {'password': {'write_only': True}}
 
     def validate_user_type(self, value):
@@ -34,18 +33,17 @@ class CustomUserSerializer(serializers.ModelSerializer):
             'email': {'required': False}
         }
 
-        def update(self, instance, validated_data):
-            instance.email = validated_data.get('email', instance.email)
-            instance.first_name = validated_data.get('first_name', instance.first_name)
-            instance.last_name = validated_data.get('last_name', instance.last_name)
-            instance.user_type = validated_data.get('user_type', instance.user_type)
+    def update(self, instance, validated_data):
+        instance.email = validated_data.get('email', instance.email)
+        instance.first_name = validated_data.get('first_name', instance.first_name)
+        instance.last_name = validated_data.get('last_name', instance.last_name)
+        instance.user_type = validated_data.get('user_type', instance.user_type)
 
-            # فحص وجود كلمة السر وتحديثها إذا تم تقديمها
-            if 'password1' in validated_data:
-                instance.set_password(validated_data['password1'])
+        if 'password' in validated_data:
+            instance.set_password(validated_data['password'])
 
-            instance.save()
-            return instance
+        instance.save()
+        return instance
 
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()

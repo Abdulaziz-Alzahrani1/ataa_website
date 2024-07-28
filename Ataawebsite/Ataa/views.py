@@ -5,8 +5,9 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import PermissionDenied
 from django.contrib.auth import logout
-from .serializers import CustomUserCreationSerializer, LoginSerializer, CustomUserSerializer ,ItemSerializer
-from .models import CustomUser ,Item
+from .serializers import CustomUserCreationSerializer, LoginSerializer, CustomUserSerializer, ItemSerializer
+from .models import CustomUser, Item
+
 
 class ItemCreateView(generics.CreateAPIView):
     queryset = Item.objects.all()
@@ -19,12 +20,15 @@ class ItemCreateView(generics.CreateAPIView):
     def get(self, request, *args, **kwargs):
         return render(request, 'add_item.html')
 
+
 class RegisterView(generics.CreateAPIView):
     serializer_class = CustomUserCreationSerializer
+
 
 class UserListView(generics.ListCreateAPIView):
     queryset = CustomUser.objects.all()
     serializer_class = CustomUserSerializer
+
 
 class LoginView(APIView):
     def post(self, request):
@@ -34,14 +38,14 @@ class LoginView(APIView):
             token, created = Token.objects.get_or_create(user=user)
             return Response({'token': token.key}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
+
 class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
         logout(request)
         return Response({'status': 'success', 'message': 'Logged out successfully'}, status=status.HTTP_200_OK)
-    
 
 
 class UpdateUserView(generics.UpdateAPIView):
@@ -53,7 +57,6 @@ class UpdateUserView(generics.UpdateAPIView):
         obj = CustomUser.objects.get(pk=self.request.user.pk)
         self.check_object_permissions(self.request, obj)
         return obj
-    
 
 
 class DeleteUserView(generics.DestroyAPIView):
@@ -66,4 +69,5 @@ class DeleteUserView(generics.DestroyAPIView):
         user = self.get_object()
         if request.user != user and not request.user.is_superuser:
             raise PermissionDenied("You do not have permission to delete this user.")
-        return super().delete(request, *args, **kwargs)
+        user.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
