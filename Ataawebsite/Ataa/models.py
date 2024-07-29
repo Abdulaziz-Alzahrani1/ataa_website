@@ -57,3 +57,14 @@ class Item(models.Model):
 
     def __str__(self):
         return self.name
+
+class Cart(models.Model):
+    CustomUser = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    item = models.ForeignKey(Item, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=1)
+
+    class Meta:
+        unique_together = ('CustomUser', 'item')
+
+    def __str__(self):
+        return f'{self.item.name} - {self.quantity}'
