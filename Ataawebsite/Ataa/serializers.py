@@ -1,47 +1,18 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate
 from .models import CustomUser, Item , Category,Cart
-from .serializers import CartSerializer
 
-class CartListView(generics.ListAPIView):
-    serializer_class = CartSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-    def get_queryset(self):
-        return Cart.objects.filter(user=self.request.user)
-
-class CartAddView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
-
-    def post(self, request):
-        data = request.data
-        item_id = data.get('item')
-        quantity = data.get('quantity', 1)
-        item = Item.objects.get(id=item_id)
-        cart_item, created = Cart.objects.get_or_create(user=request.user, item=item, defaults={'quantity': quantity})
-
-        if not created:
-            cart_item.quantity += int(quantity)
-            cart_item.save()
-
-        serializer = CartSerializer(cart_item)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-class CartDeleteView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
-
-    def delete(self, request, pk):
-        try:
-            cart_item = Cart.objects.get(pk=pk, user=request.user)
-            cart_item.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        except Cart.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
 
 class CartSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cart
         fields = '__all__'
+        read_only_fields = ('CustomUser',)
+
+    def create(self, validated_data):
+        request = self.context.get('request')
+        user = request.user
+        return Cart.objects.create(CustomUser=user, **validated_data)
 class CustomUserCreationSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
