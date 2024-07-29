@@ -7,19 +7,27 @@ from rest_framework.exceptions import PermissionDenied
 from django.contrib.auth import logout
 from .serializers import CustomUserCreationSerializer, LoginSerializer, CustomUserSerializer, ItemSerializer
 from .models import CustomUser, Item
+from django.shortcuts import render
+from .models import Category
+from .serializers import CategorySerializer
+from rest_framework.parsers import MultiPartParser, FormParser
 
+class CategoryCreateView(generics.CreateAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
 
 class ItemCreateView(generics.CreateAPIView):
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        serializer.save(CustomUser=self.request.user)
 
-    def get(self, request, *args, **kwargs):
-        return render(request, 'add_item.html')
-
+class ItemListView(generics.ListAPIView):
+    queryset = Item.objects.all()
+    serializer_class = ItemSerializer
 
 class RegisterView(generics.CreateAPIView):
     serializer_class = CustomUserCreationSerializer

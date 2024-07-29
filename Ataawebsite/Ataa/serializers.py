@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate
-from .models import CustomUser, Item
+from .models import CustomUser, Item , Category
 
 class CustomUserCreationSerializer(serializers.ModelSerializer):
     class Meta:
@@ -60,3 +60,7 @@ class ItemSerializer(serializers.ModelSerializer):
         model = Item
         fields = '__all__'
         read_only_fields = ('CustomUser',)
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ['id', 'name']

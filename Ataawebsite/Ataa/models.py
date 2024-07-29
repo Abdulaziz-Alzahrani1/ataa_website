@@ -50,7 +50,7 @@ class Item(models.Model):
     name = models.CharField(max_length=255)
     size = models.CharField(max_length=50)
     availability = models.IntegerField()
-    image = models.ImageField(upload_to='images/')  # Changed to ImageField
+    image = models.ImageField(upload_to='images/', blank=True, null=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     amount = models.IntegerField()
     CustomUser = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)  #
