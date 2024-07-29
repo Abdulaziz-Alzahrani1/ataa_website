@@ -8,9 +8,22 @@ from django.contrib.auth import logout
 from .serializers import CustomUserCreationSerializer, LoginSerializer, CustomUserSerializer, ItemSerializer
 from .models import CustomUser, Item
 from django.shortcuts import render
-from .models import Category
+from .models import Category, Cart
 from .serializers import CategorySerializer
 from rest_framework.parsers import MultiPartParser, FormParser
+from .serializers import CartSerializer
+
+class CartAddView(generics.CreateAPIView):
+    queryset = Cart.objects.all()
+    serializer_class = CartSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context.update({
+            'request': self.request
+        })
+        return context
 
 class CategoryCreateView(generics.CreateAPIView):
     queryset = Category.objects.all()
