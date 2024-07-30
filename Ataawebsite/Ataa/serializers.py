@@ -1,7 +1,18 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate
-from .models import CustomUser, Item
+from .models import CustomUser, Item , Category,Cart
 
+
+class CartSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Cart
+        fields = '__all__'
+        read_only_fields = ('CustomUser',)
+
+    def create(self, validated_data):
+        request = self.context.get('request')
+        user = request.user
+        return Cart.objects.create(CustomUser=user, **validated_data)
 class CustomUserCreationSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
@@ -60,3 +71,7 @@ class ItemSerializer(serializers.ModelSerializer):
         model = Item
         fields = '__all__'
         read_only_fields = ('CustomUser',)
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ['id', 'name']
