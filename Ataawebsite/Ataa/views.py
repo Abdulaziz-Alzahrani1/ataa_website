@@ -24,6 +24,32 @@ class CartAddView(generics.CreateAPIView):
             'request': self.request
         })
         return context
+    
+
+class CartListView(generics.ListAPIView):
+    serializer_class = CartSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        """
+        This view should return a list of all the items in the cart
+        for the currently authenticated user.
+        """
+        user = self.request.user
+        return Cart.objects.filter(CustomUser=user)
+
+class CartDeleteView(generics.DestroyAPIView):
+    queryset = Cart.objects.all()
+    serializer_class = CartSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        """
+        Ensure that only items that belong to the authenticated user can be deleted.
+        """
+        user = self.request.user
+        return Cart.objects.filter(CustomUser=user)
+
 
 class CategoryCreateView(generics.CreateAPIView):
     queryset = Category.objects.all()
