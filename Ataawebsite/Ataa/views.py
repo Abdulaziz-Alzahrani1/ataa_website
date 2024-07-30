@@ -121,10 +121,26 @@ class DeleteUserView(generics.DestroyAPIView):
         user.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-class OrderListView(generics.ListAPIView):
+class OrderCreateView(generics.CreateAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
+
+    def perform_create(self, serializer):
+        user = self.request.user
+        cart_id = self.request.data.get('cart')
+        if not cart_id:
+            raise serializers.ValidationError("Cart ID is required")
+        try:
+            cart = Cart.objects.get(id=cart_id, CustomUser=user)
+        except Cart.DoesNotExist:
+            raise serializers.ValidationError("Invalid Cart ID")
+        serializer.save(user=user, cart=cart)
+
+
+class OrderListView(generics.ListAPIView):
+    serializer_class = OrderSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         user = self.request.user
