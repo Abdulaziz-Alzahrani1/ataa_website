@@ -1,7 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate
-from .models import CustomUser, Item , Category,Cart
-
+from .models import CustomUser, Item, Category, Cart, Order
 
 class CartSerializer(serializers.ModelSerializer):
     class Meta:
@@ -13,6 +12,7 @@ class CartSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         user = request.user
         return Cart.objects.create(CustomUser=user, **validated_data)
+
 class CustomUserCreationSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
@@ -71,7 +71,13 @@ class ItemSerializer(serializers.ModelSerializer):
         model = Item
         fields = '__all__'
         read_only_fields = ('CustomUser',)
+
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ['id', 'name']
+
+class OrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = ['id', 'user', 'cart', 'created_at']

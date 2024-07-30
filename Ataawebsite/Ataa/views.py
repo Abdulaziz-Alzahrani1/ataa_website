@@ -1,5 +1,7 @@
 from rest_framework import generics, status, permissions
 from rest_framework.response import Response
+from .models import Order
+from .serializers import OrderSerializer
 from rest_framework.authtoken.models import Token
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
@@ -118,3 +120,12 @@ class DeleteUserView(generics.DestroyAPIView):
             raise PermissionDenied("You do not have permission to delete this user.")
         user.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+class OrderListView(generics.ListAPIView):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        return Order.objects.filter(user=user)

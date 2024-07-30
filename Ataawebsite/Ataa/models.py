@@ -53,7 +53,7 @@ class Item(models.Model):
     image = models.ImageField(upload_to='images/', blank=True, null=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     amount = models.IntegerField()
-    CustomUser = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)  #
+    CustomUser = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name
@@ -65,3 +65,11 @@ class Cart(models.Model):
 
     def __str__(self):
         return f'{self.item.name} - {self.quantity}'
+
+class Order(models.Model):
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'Order {self.id} for User {self.user.id} with Cart {self.cart.id}'
