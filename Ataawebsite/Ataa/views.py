@@ -33,10 +33,6 @@ class CartListView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        """
-        This view should return a list of all the items in the cart
-        for the currently authenticated user.
-        """
         user = self.request.user
         return Cart.objects.filter(CustomUser=user)
 
@@ -46,9 +42,6 @@ class CartDeleteView(generics.DestroyAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        """
-        Ensure that only items that belong to the authenticated user can be deleted.
-        """
         user = self.request.user
         return Cart.objects.filter(CustomUser=user)
 
@@ -56,6 +49,8 @@ class CartDeleteView(generics.DestroyAPIView):
 class CategoryCreateView(generics.CreateAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+
+
 
 class ItemCreateView(generics.CreateAPIView):
     queryset = Item.objects.all()
@@ -66,9 +61,17 @@ class ItemCreateView(generics.CreateAPIView):
     def perform_create(self, serializer):
         serializer.save(CustomUser=self.request.user)
 
+
+class ItemDetailView(generics.RetrieveAPIView):
+    queryset = Item.objects.all()
+    serializer_class = ItemSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
 class ItemListView(generics.ListAPIView):
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
+
+
 
 class RegisterView(generics.CreateAPIView):
     serializer_class = CustomUserCreationSerializer
@@ -120,6 +123,8 @@ class DeleteUserView(generics.DestroyAPIView):
             raise PermissionDenied("You do not have permission to delete this user.")
         user.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
 
 class OrderCreateView(generics.CreateAPIView):
     queryset = Order.objects.all()
